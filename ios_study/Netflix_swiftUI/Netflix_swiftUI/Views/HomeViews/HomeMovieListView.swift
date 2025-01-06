@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeMovieListView: View {
     let category: String
     let movies: [MoviePreview]
+    @EnvironmentObject var homeViewModel: HomeViewModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -24,7 +25,9 @@ struct HomeMovieListView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 7) {
                     ForEach(movies) { movie in
-                        Button(action: {}) {
+                        Button(action: {
+                            homeViewModel.showDetail(for: movie)
+                        }) {
                             AsyncImage(url: movie.posterImageURL) { phase in
                                 switch phase {
                                 case .empty:

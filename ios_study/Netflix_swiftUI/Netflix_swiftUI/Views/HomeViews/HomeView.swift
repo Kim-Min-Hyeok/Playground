@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var homeViewModel = HomeViewModel()
+    @EnvironmentObject var homeViewModel: HomeViewModel // ViewModel 접근
+    @EnvironmentObject var router: Router // 라우팅 관리
     
     var body: some View {
         ZStack (alignment: .top){

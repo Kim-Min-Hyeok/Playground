@@ -18,10 +18,11 @@ class HomeViewModel: ObservableObject {
     @Published var moviesByCategory: [String: [MoviePreview]] = [:]
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
-
+    
     private var cancellables = Set<AnyCancellable>()
     private let apiClient = MoviesAPIClient.shared
-
+    private let router: Router
+    
     let categories = [
         "Popular Movies",
         "Now Playing Movies",
@@ -29,28 +30,32 @@ class HomeViewModel: ObservableObject {
         "Top Rated Movies",
         "Trending Movies"
     ]
-
+    
+    init(router: Router) {
+        self.router = router
+    }
+    
     func fetchAllMovies() {
         isLoading = true
         errorMessage = nil
-
+        
         let publishers = categories.map { category in
             apiClient.fetchMovies(for: category)
                 .map { movies in
-                        print("Processing category: \(category)")
-                        return (category, movies.compactMap { movie in
-                            if let posterURL = movie.posterImageURL {
-                                print("Movie: \(movie.title), Poster URL: \(posterURL)")
-                                return MoviePreview(id: movie.id,
-                                                  category: category,
-                                                  posterImageURL: posterURL)
-                            }
-                            print("No poster URL for movie: \(movie.title)")
-                            return nil
-                        })
-                    }
+                    print("Processing category: \(category)")
+                    return (category, movies.compactMap { movie in
+                        if let posterURL = movie.posterImageURL {
+                            print("Movie: \(movie.title), Poster URL: \(posterURL)")
+                            return MoviePreview(id: movie.id,
+                                                category: category,
+                                                posterImageURL: posterURL)
+                        }
+                        print("No poster URL for movie: \(movie.title)")
+                        return nil
+                    })
+                }
         }
-
+        
         Publishers.MergeMany(publishers)
             .collect()
             .sink(receiveCompletion: { completion in
@@ -74,5 +79,10 @@ class HomeViewModel: ObservableObject {
                 }
             })
             .store(in: &cancellables)
+    }
+    
+    func showDetail(for movie: MoviePreview) {
+        let detailViewModel = DetailViewModel(movie: movie)
+        self.router.navigate(to: .detail(movie: movie, viewModel: detailViewModel))
     }
 }
