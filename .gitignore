@@ -18,6 +18,7 @@ timeline.xctimeline
 playground.xcworkspace
 
 # Frameworks
+**/opencv2.framwork/**
 Frameworks/
 **/Frameworks/
 **/Frameworks/opencv2.framework/
