@@ -20,6 +20,9 @@ playground.xcworkspace
 # Frameworks
 Frameworks/
 **/Frameworks/
+**/Frameworks/opencv2.framework/
+**/Frameworks/opencv2.framework/**
+
 
 # Swift Package Manager
 #
