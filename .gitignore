@@ -18,12 +18,12 @@ timeline.xctimeline
 playground.xcworkspace
 
 # Frameworks
-**/opencv2.framwork/**
 Frameworks/
 **/Frameworks/
 **/Frameworks/opencv2.framework/
 **/Frameworks/opencv2.framework/**
-
+ScanScore/opencv2.framework/
+ScanScore/opencv2.framework/**
 
 # Swift Package Manager
 #
