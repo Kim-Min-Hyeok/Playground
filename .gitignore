@@ -24,6 +24,8 @@ Frameworks/
 **/Frameworks/opencv2.framework/**
 ScanScore/opencv2.framework/
 ScanScore/opencv2.framework/**
+opencv
+opencv2
 
 # Swift Package Manager
 #
