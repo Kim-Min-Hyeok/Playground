@@ -68,8 +68,9 @@ class VisionProcessor {
             }
         }
         
+        request.recognitionLevel = .accurate // 정확도 높은 인식
         request.recognitionLanguages = ["en-US"]
-        request.usesLanguageCorrection = false
+        request.usesLanguageCorrection = false // 필요시 언어 교정도 활성화
         
         DispatchQueue.global(qos: .userInitiated).async {
             do {
