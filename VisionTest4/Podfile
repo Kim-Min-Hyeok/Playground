@@ -1,0 +1,21 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '17.0'
+
+platform :ios, '17.0'
+
+target 'VisionTest4' do
+  use_frameworks!
+
+  # Pods for VisionTest4
+  pod 'OpenCV', '~> 4.3'  
+
+  target 'VisionTest4Tests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'VisionTest4UITests' do
+    # Pods for testing
+  end
+
+end

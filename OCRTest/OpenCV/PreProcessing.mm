@@ -37,31 +37,43 @@ cv::Mat removeStaffLines(cv::Mat &inputImage) {
     // 1. 그레이스케일 변환
     cv::cvtColor(inputImage, gray, cv::COLOR_BGR2GRAY);
     
-    // 2. 이진화: THRESH_BINARY 사용 → 배경은 흰색, 요소는 검은색
-    cv::threshold(gray, binary, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+    // 2. 이진화: 배경은 흰색, 요소는 검은색 (반전 없이)
+    cv::threshold(gray, binary, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
     
     // 3. HoughLinesP를 이용한 수평선 검출
     std::vector<cv::Vec4i> lines;
-    // 파라미터 설명:
-    // - 1: 거리 해상도 (픽셀 단위)
-    // - CV_PI/180: 각도 해상도 (1도)
-    // - 100: 선 검출 임계값 (조정 필요)
-    // - 최소 선 길이: 이미지 너비의 절반 (조정 가능)
-    // - 최대 간격: 20픽셀 (조정 가능)
-    cv::HoughLinesP(binary, lines, 1, CV_PI / 180, 100, binary.cols / 2, 20);
+    cv::HoughLinesP(binary, lines, 1, CV_PI / 180, 100, binary.cols / 3, 20);
     
-    // 4. 검출된 수평선 제거: 일정 길이 이상의, 수평(±10도 미만)의 선을 흰색으로 칠함
+    // 검출된 오선들의 중앙 y 좌표를 저장할 벡터
+    std::vector<int> staffYs;
+    int thickness = 5; // 각 오선의 두께를 보정할 값 (조정 가능)
+    
     for (size_t i = 0; i < lines.size(); i++) {
         cv::Vec4i l = lines[i];
         // 선의 기울기를 계산 (단위: 도)
         double angle = std::atan2(l[3] - l[1], l[2] - l[0]) * 180.0 / CV_PI;
-        if (std::abs(angle) < 10.0) { // 수평선 판단 (±10도)
-            // 선의 두께는 3픽셀 (필요에 따라 조정)
-            cv::line(binary, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(255), 3);
+        if (std::abs(angle) < 10.0) { // 수평선으로 간주 (±10도 미만)
+            // 선의 중앙 y 좌표
+            int y = (l[1] + l[3]) / 2;
+            staffYs.push_back(y);
         }
+    }
+    
+    // 검출된 오선이 있다면, 최소 y와 최대 y를 계산하여 그 영역을 하나의 rectangle으로 채움
+    if (!staffYs.empty()) {
+        int minY = *std::min_element(staffYs.begin(), staffYs.end()) - thickness / 2;
+        int maxY = *std::max_element(staffYs.begin(), staffYs.end()) + thickness / 2;
+        
+        // 이미지 경계를 벗어나지 않도록 보정
+        minY = std::max(minY, 0);
+        maxY = std::min(maxY, binary.rows);
+        
+        // 이미지 전체 너비에 대해 오선 영역만 흰색으로 칠함
+        cv::rectangle(binary, cv::Point(0, minY), cv::Point(binary.cols, maxY), cv::Scalar(255), cv::FILLED);
     }
     
     return binary;
 }
+
 
 @end
