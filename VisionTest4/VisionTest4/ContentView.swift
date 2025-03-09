@@ -5,15 +5,13 @@ struct ContentView: View {
     @State private var showingFilePicker = false
     @State private var showingPhotoPicker = false
     @State private var pdfURL: URL?
-    @State private var rawPages: [UIImage] = []         // 파일 또는 사진에서 추출한 원본 페이지 이미지
-    @State private var scorePages: [ScorePageData] = []   // 전처리+OCR 결과가 적용된 페이지 데이터
+    @State private var rawPages: [UIImage] = []      
+    @State private var scorePages: [ScorePageData] = []
     
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
-                // 악보 영역: 버튼 영역을 제외한 영역에 맞게 표시
                 ScoreView(scorePages: scorePages.isEmpty ? rawPages.map {
-                    // OCR 전처리 전인 경우, 빈 OCR 결과 및 전처리 이미지 없이 ScorePageData 생성
                     let pageModel = ScorePageModel(s_pid: UUID(), rotation: 0, scoreAnnotations: [], scoreMemos: [], scoreChords: [])
                     return ScorePageData(originalImage: $0, processedImage: nil, pageModel: pageModel, chords: [])
                 } : scorePages)
@@ -42,12 +40,10 @@ struct ContentView: View {
         }
     }
     
-    /// 버튼 영역 높이 (상황에 맞게 조정 가능)
     private func buttonAreaHeight(in geometry: GeometryProxy) -> CGFloat {
         return 80
     }
     
-    /// 버튼 영역: 파일 선택, 앨범 선택, 코드 인식
     private var buttonArea: some View {
         HStack(spacing: 20) {
             Button("파일 앱에서 선택") {
@@ -67,11 +63,9 @@ struct ContentView: View {
         }
     }
     
-    /// PDF 파일에서 페이지를 추출하여 rawPages에 저장합니다.
     func extractPages(from url: URL) {
         let pages = PDFProcessor.extractPages(from: url)
         self.rawPages = pages
-        // 초기에는 OCR 결과가 없으므로, scorePages는 rawPages 기반의 빈 결과로 구성
         var pagesData: [ScorePageData] = []
         for image in pages {
             let pageModel = ScorePageModel(s_pid: UUID(), rotation: 0, scoreAnnotations: [], scoreMemos: [], scoreChords: [])
@@ -81,7 +75,6 @@ struct ContentView: View {
         self.scorePages = pagesData
     }
     
-    /// 선택된 rawPages에 대해 ScoreProcessor를 사용하여 전처리 및 OCR(코드 인식)을 수행합니다.
     func processScoreRecognition() {
         let group = DispatchGroup()
         var pagesData: [ScorePageData] = []

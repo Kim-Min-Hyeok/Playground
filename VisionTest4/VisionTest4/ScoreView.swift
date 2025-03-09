@@ -7,14 +7,12 @@ struct ScoreView: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: true) {
             HStack(spacing: 20) {
-                // 원본 악보 페이지 그룹
                 ForEach(scorePages) { pageData in
                     ZStack {
                         Image(uiImage: pageData.originalImage)
                             .resizable()
                             .scaledToFit()
                         
-                        // 원본 이미지 위에 코드 오버레이
                         ForEach(pageData.chords) { chord in
                             GeometryReader { geo in
                                 let scaleX = geo.size.width / pageData.originalImage.size.width
@@ -40,11 +38,9 @@ struct ScoreView: View {
                     .shadow(radius: 2)
                 }
                 
-                // 구분선 (선택 사항)
                 Divider()
                     .frame(height: 400)
                 
-                // 전처리된 이미지 그룹 (오선 제거 결과)
                 ForEach(scorePages) { pageData in
                     if let processed = pageData.processedImage {
                         Image(uiImage: processed)
